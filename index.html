@@ -1,36 +1,89 @@
 
-<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEWTON — gravitation à trois corps</title><style>body{margin:0;background:#111827;color:#e5edf8;font:15px system-ui}main{max-width:none;margin:0;padding:0}main>h2,main>div,main>p,main>.grid{margin-left:12px;margin-right:12px}h2{font-size:20px}svg{display:block;width:100%;height:100vh;height:100dvh;background:#101c30;border:0;border-radius:0;touch-action:none}button{font:inherit;background:#285d9a;color:white;border:0;border-radius:6px;padding:10px;margin:8px 5px 8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}.panel{background:#1d2a3e;padding:12px;border-radius:9px}.control{display:grid;grid-template-columns:75px 1fr 45px;gap:6px;align-items:center;margin:10px 0}.control label,.control output{font-size:13px}input{width:100%}p{font-size:13px;color:#b7c9dc}#status{color:#d9e7fb}</style></head><body><main><h2>Gravitation newtonienne — trois corps libres</h2><svg id="plane" viewBox="0 0 640 600" xmlns="http://www.w3.org/2000/svg"><path id="trail1" fill="none" stroke="#ffb366" stroke-width="1.5"/><path id="trail2" fill="none" stroke="#6fe5f0" stroke-width="1.5"/><path id="trail3" fill="none" stroke="#cf9cff" stroke-width="1.5"/><g id="velocity1" pointer-events="none"><line x1="230" y1="300" x2="230" y2="345" stroke="#ffb366" stroke-width="1.5" stroke-linecap="round"/><polygon points="230,345 226,337 234,337" fill="#ffb366"/><text fill="#ffb366" font-size="15" font-weight="bold">v₀</text></g><g id="velocity2" pointer-events="none"><line x1="410" y1="300" x2="410" y2="245" stroke="#6fe5f0" stroke-width="1.5" stroke-linecap="round"/><polygon points="410,245 406,253 414,253" fill="#6fe5f0"/><text fill="#6fe5f0" font-size="15" font-weight="bold">v₀</text></g><g id="velocity3" pointer-events="none"><line stroke="#cf9cff" stroke-width="1.5" stroke-linecap="round"/><polygon fill="#cf9cff"/><text fill="#cf9cff" font-size="15" font-weight="bold">v₀</text></g><circle id="body3" cx="320" cy="190" r="8" fill="#cf9cff"/><circle id="body1" cx="230" cy="300" r="11" fill="#ffb366"/><circle id="body2" cx="410" cy="300" r="9" fill="#6fe5f0"/></svg><div><button id="choose1">Placer corps orange</button><button id="choose2">Placer corps cyan</button><button id="choose3">Placer corps violet</button></div><div id="diagnostic" style="font-size:13px;color:#ffd27a;margin:6px 0">JavaScript non exécuté : ouvrir ce fichier dans Safari ou Chrome, hors aperçu.</div><div><button id="play">Démarrer</button><button id="reset">Retour à t = 0</button><button id="clear">Effacer les traces</button></div><div id="status">Trois corps visibles — prêt à démarrer.</div><p>Choisissez un corps puis touchez le plan pour le positionner, ou faites-le glisser. Les flèches indiquent les vitesses initiales (direction et longueur proportionnelle à la vitesse). Les quinze curseurs définissent les conditions initiales. Unités arbitraires, G = 1.</p><div class="grid"><section class="panel"><b style="color:#ffb366">Corps 1</b><div id="c1"></div></section><section class="panel"><b style="color:#6fe5f0">Corps 2</b><div id="c2"></div></section><section class="panel"><b style="color:#cf9cff">Corps 3</b><div id="c3"></div></section><section class="panel"><b>Évolution</b><div class="control"><label for="rate">Rythme</label><input id="rate" type="range" min="0.1" max="5" step="0.1" value="1"><output id="rateout">1</output></div><p>Après une modification des masses ou vitesses, utiliser « Retour à t = 0 ».</p></section></div></main><script>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>NEWTON — gravitation à trois corps</title><style>
+/* PRÉSENTATION : couleurs, disposition, taille du plan et commandes. */
+body{margin:0;background:#111827;color:#e5edf8;font:15px system-ui}main{max-width:none;margin:0;padding:0}main>h2,main>div,main>p,main>.grid{margin-left:12px;margin-right:12px}h2{font-size:20px}svg{display:block;width:100%;height:100vh;height:100dvh;background:#101c30;border:0;border-radius:0;touch-action:none}button{font:inherit;background:#285d9a;color:white;border:0;border-radius:6px;padding:10px;margin:8px 5px 8px 0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(245px,1fr));gap:12px}.panel{background:#1d2a3e;padding:12px;border-radius:9px}.control{display:grid;grid-template-columns:75px 1fr 45px;gap:6px;align-items:center;margin:10px 0}.control label,.control output{font-size:13px}input{width:100%}p{font-size:13px;color:#b7c9dc}#status{color:#d9e7fb} 
+/* Fin des règles de présentation. */
+</style></head><body><main><h2>Gravitation newtonienne — trois corps libres</h2><svg id="plane" viewBox="0 0 640 600" xmlns="http://www.w3.org/2000/svg"><path id="trail1" fill="none" stroke="#ffb366" stroke-width="1.5"/><path id="trail2" fill="none" stroke="#6fe5f0" stroke-width="1.5"/><path id="trail3" fill="none" stroke="#cf9cff" stroke-width="1.5"/><g id="velocity1" pointer-events="none"><line x1="230" y1="300" x2="230" y2="345" stroke="#ffb366" stroke-width="1.5" stroke-linecap="round"/><polygon points="230,345 226,337 234,337" fill="#ffb366"/><text fill="#ffb366" font-size="15" font-weight="bold">v₀</text></g><g id="velocity2" pointer-events="none"><line x1="410" y1="300" x2="410" y2="245" stroke="#6fe5f0" stroke-width="1.5" stroke-linecap="round"/><polygon points="410,245 406,253 414,253" fill="#6fe5f0"/><text fill="#6fe5f0" font-size="15" font-weight="bold">v₀</text></g><g id="velocity3" pointer-events="none"><line stroke="#cf9cff" stroke-width="1.5" stroke-linecap="round"/><polygon fill="#cf9cff"/><text fill="#cf9cff" font-size="15" font-weight="bold">v₀</text></g><circle id="body3" cx="320" cy="190" r="8" fill="#cf9cff"/><circle id="body1" cx="230" cy="300" r="11" fill="#ffb366"/><circle id="body2" cx="410" cy="300" r="9" fill="#6fe5f0"/></svg><div><button id="choose1">Placer corps orange</button><button id="choose2">Placer corps cyan</button><button id="choose3">Placer corps violet</button></div><div id="diagnostic" style="font-size:13px;color:#ffd27a;margin:6px 0">JavaScript non exécuté : ouvrir ce fichier dans Safari ou Chrome, hors aperçu.</div><div><button id="play">Démarrer</button><button id="reset">Retour à t = 0</button><button id="clear">Effacer les traces</button></div><div id="status">Trois corps visibles — prêt à démarrer.</div><p>Choisissez un corps puis touchez le plan pour le positionner, ou faites-le glisser. Les flèches indiquent les vitesses initiales (direction et longueur proportionnelle à la vitesse). Les quinze curseurs définissent les conditions initiales. Unités arbitraires, G = 1.</p><div class="grid"><section class="panel"><b style="color:#ffb366">Corps 1</b><div id="c1"></div></section><section class="panel"><b style="color:#6fe5f0">Corps 2</b><div id="c2"></div></section><section class="panel"><b style="color:#cf9cff">Corps 3</b><div id="c3"></div></section><section class="panel"><b>Évolution</b><div class="control"><label for="rate">Rythme</label><input id="rate" type="range" min="0.1" max="5" step="0.1" value="1"><output id="rateout">1</output></div><p>Après une modification des masses ou vitesses, utiliser « Retour à t = 0 ».</p></section></div></main><script>
+/* ============================================================
+   NEWTON — SIMULATION GRAVITATIONNELLE À TROIS CORPS
+   Les unités sont arbitraires et la constante G vaut 1.
+   Chaque corps possède une masse, une position et une vitesse.
+   Les calculs physiques sont indépendants du dessin SVG.
+   ============================================================ */
 (function(){
 'use strict';
+// Accès abrégé aux éléments de la page par leur identifiant.
 var $=function(id){return document.getElementById(id)};
+// Définition commune des cinq curseurs de chaque corps :
+// code, libellé, minimum, maximum et pas de réglage.
 var defs=[['m','Masse',0.1,100,0.1],['x','Position x',-12,12,0.1],['y','Position y',-12,12,0.1],['v','Vitesse',0,4,0.01],['a','Angle °',-180,180,1]];
+// Conditions initiales affichées au chargement (corps 1, 2 et 3).
 var initial={m1:8,x1:-3,y1:0,v1:0.25,a1:-90,m2:2,x2:3,y2:0,v2:1,a2:90,m3:1,x3:0,y3:7,v3:0.5,a3:0};
+// État du modèle : starts = positions/vitesses à t=0 ;
+// bodies = état courant ; tracks = points des trajectoires.
+// dt est le pas de temps physique ; acc accumule le temps simulé.
 var starts=[],bodies=[],tracks=[[],[],[]],running=false,t=0,drag=-1,selected=0,stop=false,previous=0,acc=0,dt=0.003;
+// INTERFACE : création des quinze curseurs et lecture des changements.
+// Avant le départ, position, masse et flèche initiale sont actualisées.
 function makeControls(){for(var i=1;i<=3;i++){for(var j=0;j<defs.length;j++){var d=defs[j],key=d[0]+i,wrap=document.createElement('div');wrap.className='control';var lab=document.createElement('label');lab.htmlFor=key;lab.textContent=d[1];var inp=document.createElement('input');inp.type='range';inp.id=key;inp.min=d[2];inp.max=d[3];inp.step=d[4];inp.value=initial[key];var out=document.createElement('output');out.id=key+'out';out.textContent=inp.value;wrap.appendChild(lab);wrap.appendChild(inp);wrap.appendChild(out);$('c'+i).appendChild(wrap);inp.addEventListener('input',function(e){var id=e.target.id;$(id+'out').textContent=e.target.value;if(!running&&t===0){var n=Number(id.slice(-1))-1;if(id[0]==='x'||id[0]==='y'){bodies[n][id[0]]=Number(e.target.value);starts[n][id[0]]=Number(e.target.value)}else if(id[0]==='m'){bodies[n].m=Number(e.target.value)}else if(id[0]==='v'||id[0]==='a'){var v=Number($('v'+(n+1)).value),a=Number($('a'+(n+1)).value)*Math.PI/180;starts[n].vx=v*Math.cos(a);starts[n].vy=v*Math.sin(a)}render()}})}}}
+// Retour à t=0 : relire tous les curseurs, réinitialiser les corps,
+// supprimer les traces et rendre les vecteurs initiaux visibles.
 function reset(){velocitiesHidden=false;for(var k=1;k<=3;k++){$('velocity'+k).removeAttribute('display');$('velocity'+k).removeAttribute('visibility');$('velocity'+k).style.display=''}bodies=[];for(var i=1;i<=3;i++){var angle=Number($('a'+i).value)*Math.PI/180,v=Number($('v'+i).value);bodies.push({m:Number($('m'+i).value),x:Number($('x'+i).value),y:Number($('y'+i).value),vx:v*Math.cos(angle),vy:v*Math.sin(angle)})}starts=bodies.map(function(b){return {x:b.x,y:b.y,vx:b.vx,vy:b.vy}});tracks=[[],[],[]];running=false;stop=false;t=0;acc=0;$('play').textContent='Démarrer';render()}
+// Convertir des coordonnées physiques (x,y) en pixels SVG.
+// L'axe vertical de l'écran est orienté vers le bas.
 function pos(b){return [320+b.x*15,300-b.y*15]}
 var velocitiesHidden=false;
+// Dessiner la flèche de vitesse initiale du corps i :
+// origine au point t=0, direction selon (vx,vy), longueur selon la norme.
 function drawInitialVelocity(i){var vector=$('velocity'+(i+1));if(velocitiesHidden){vector.setAttribute('display','none');vector.style.display='none';return}vector.removeAttribute('display');vector.removeAttribute('visibility');var b=starts[i],g=$('velocity'+(i+1)),line=g.querySelector('line'),head=g.querySelector('polygon'),v=Math.hypot(b.vx,b.vy),p=pos(b);if(v<0.00001){g.style.display='none';return}g.style.display='';var ux=b.vx/v,uy=-b.vy/v,L=35+v*20,x=p[0]+ux*L,y=p[1]+uy*L;line.setAttribute('x1',p[0]);line.setAttribute('y1',p[1]);line.setAttribute('x2',x);line.setAttribute('y2',y);var px=-uy,py=ux;head.setAttribute('points',x+','+y+' '+(x-8*ux+4*px)+','+(y-8*uy+4*py)+' '+(x-8*ux-4*px)+','+(y-8*uy-4*py));var label=g.querySelector('text');label.setAttribute('x',x+9*px);label.setAttribute('y',y+9*py)}
+// DESSIN : mettre à jour les cercles, leur rayon proportionnel
+// à la racine cubique de la masse, les flèches et les trajectoires.
 function render(){for(var i=0;i<3;i++){drawInitialVelocity(i);var p=pos(bodies[i]);$('body'+(i+1)).setAttribute('cx',p[0]);$('body'+(i+1)).setAttribute('cy',p[1]);$('body'+(i+1)).setAttribute('r',5*Math.cbrt(bodies[i].m));var str='';for(var j=0;j<tracks[i].length;j++){var q=tracks[i][j];str+=(j?' L ':'M ')+(320+q[0]*15).toFixed(2)+' '+(300-q[1]*15).toFixed(2)}$('trail'+(i+1)).setAttribute('d',str)}$('status').textContent='t = '+t.toFixed(2)+' · trois corps'+(stop?' · rapprochement excessif':'')}
+// PHYSIQUE : accélérations newtoniennes des trois corps.
+// Chaque paire (i,j) est traitée une seule fois : 1-2, 1-3, 2-3.
+// Avec G=1, l'accélération de i due à j est :
+//   a_i = m_j * (r_j-r_i) / |r_j-r_i|^3.
+// Si deux corps sont trop proches (distance < 0,05), on arrête
+// la simulation : le pas fixe ne serait plus suffisamment fiable.
 function accelerations(){var a=bodies.map(function(){return {x:0,y:0}});for(var i=0;i<3;i++)for(var j=i+1;j<3;j++){var dx=bodies[j].x-bodies[i].x,dy=bodies[j].y-bodies[i].y,r2=dx*dx+dy*dy;if(r2<0.0025){stop=true;running=false;$('play').textContent='Arrêt';return null}var f=1/(r2*Math.sqrt(r2));a[i].x+=bodies[j].m*dx*f;a[i].y+=bodies[j].m*dy*f;a[j].x-=bodies[i].m*dx*f;a[j].y-=bodies[i].m*dy*f}return a}
+// INTÉGRATION : un pas « kick-drift-kick » (velocity Verlet).
+// 1. Demi-correction des vitesses avec les accélérations actuelles.
+// 2. Avancement des positions pendant dt.
+// 3. Recalcul des accélérations aux nouvelles positions.
+// 4. Seconde demi-correction des vitesses.
+// On mémorise un point de trajectoire tous les huit pas,
+// avec une limite de 1 000 points par corps.
 function step(){var a=accelerations();if(!a)return;for(var i=0;i<3;i++){bodies[i].vx+=a[i].x*dt/2;bodies[i].vy+=a[i].y*dt/2;bodies[i].x+=bodies[i].vx*dt;bodies[i].y+=bodies[i].vy*dt}a=accelerations();if(!a)return;for(var i=0;i<3;i++){bodies[i].vx+=a[i].x*dt/2;bodies[i].vy+=a[i].y*dt/2}t+=dt;if(Math.round(t/dt)%8===0){for(var i=0;i<3;i++){tracks[i].push([bodies[i].x,bodies[i].y]);if(tracks[i].length>1000)tracks[i].shift()}}}
+// INTERACTION : convertir la position du doigt/de la souris en SVG.
 function locationOf(e){var r=$('plane').getBoundingClientRect();return {x:(e.clientX-r.left)*640/r.width,y:(e.clientY-r.top)*600/r.height}}
+// Autoriser le déplacement uniquement avant le début de l'évolution.
 function startDrag(e){if(running||t>0)return;drag=selected;moveDrag(e)}
+// Déplacer le corps choisi et synchroniser ses curseurs X et Y.
 function moveDrag(e){if(drag<0)return;var p=locationOf(e),i=drag+1,x=Math.max(-12,Math.min(12,(p.x-320)/15)),y=Math.max(-12,Math.min(12,(300-p.y)/15));bodies[drag].x=x;bodies[drag].y=y;starts[drag].x=x;starts[drag].y=y;['x','y'].forEach(function(k){$(k+i).value=bodies[drag][k].toFixed(1);$(k+i+'out').textContent=$(k+i).value});render()}
 var plane=$('plane');
+// Sélectionner le corps à déplacer et surligner son bouton.
 function choose(n){selected=n;$('choose1').style.background=n===0?'#b96518':'#285d9a';$('choose2').style.background=n===1?'#087a8b':'#285d9a';$('choose3').style.background=n===2?'#7950a0':'#285d9a';$('status').textContent='Touchez le plan pour placer le corps '+(n+1)}
 $('choose1').addEventListener('click',function(){choose(0)});$('choose2').addEventListener('click',function(){choose(1)});$('choose3').addEventListener('click',function(){choose(2)});choose(0);
 $('diagnostic').textContent='JavaScript actif — placement tactile disponible';$('diagnostic').style.color='#83e7ad';
+// Gestion du pointeur : souris, stylet ou toucher compatible.
 plane.addEventListener('pointerdown',function(e){startDrag(e);if(drag>=0){try{plane.setPointerCapture(e.pointerId)}catch(err){}e.preventDefault()}},false);
 plane.addEventListener('pointermove',function(e){if(drag>=0){moveDrag(e);e.preventDefault()}},false);
 ['pointerup','pointercancel','lostpointercapture'].forEach(function(type){plane.addEventListener(type,function(){drag=-1})});
 // Repli pour les navigateurs iOS où les événements Pointer ne sont pas relayés.
+// Gestion tactile complémentaire pour certains navigateurs iOS.
 plane.addEventListener('touchstart',function(e){if(drag<0&&e.touches.length===1)startDrag(e.touches[0]);if(drag>=0)e.preventDefault()},{passive:false});
 plane.addEventListener('touchmove',function(e){if(drag>=0&&e.touches.length){moveDrag(e.touches[0]);e.preventDefault()}},{passive:false});
 plane.addEventListener('touchend',function(){drag=-1});
 plane.addEventListener('touchcancel',function(){drag=-1});
+// COMMANDES : lecture/pause, retour à zéro, effacement des traces
+// ET des flèches initiales, puis réglage de la vitesse d'évolution.
 $('play').addEventListener('click',function(){if(stop)return;running=!running;this.textContent=running?'Pause':t===0?'Démarrer':'Reprendre'});$('reset').addEventListener('click',reset);$('clear').addEventListener('click',function(){tracks=[[],[],[]];velocitiesHidden=true;for(var k=1;k<=3;k++){$('trail'+k).setAttribute('d','');$('velocity'+k).setAttribute('display','none');$('velocity'+k).style.display='none'}render()});$('rate').addEventListener('input',function(){$('rateout').textContent=this.value});
+// BOUCLE D'ANIMATION : synchroniser le temps réel et le temps simulé.
+// Les calculs ne sont exécutés que pendant la marche ; le navigateur
+// peut demander des images à son propre rythme via requestAnimationFrame.
 function frame(now){var elapsed=previous?Math.min((now-previous)/1000,0.05):0;previous=now;if(running){acc+=elapsed*Number($('rate').value);var n=0;while(acc>=dt&&n<180&&running){step();acc-=dt;n++}render()}requestAnimationFrame(frame)}
+// INITIALISATION : construire les commandes, préparer les trois corps
+// et lancer la boucle d'affichage.
 makeControls();reset();requestAnimationFrame(frame);
 })();
 </script></body></html>
