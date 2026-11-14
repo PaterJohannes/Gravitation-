@@ -3,7 +3,7 @@
 (function(){
 'use strict';
 var $=function(id){return document.getElementById(id)};
-var defs=[['m','Masse',0.1,20,0.1],['x','Position x',-12,12,0.1],['y','Position y',-12,12,0.1],['v','Vitesse',0,4,0.01],['a','Angle °',-180,180,1]];
+var defs=[['m','Masse',0.1,100,0.1],['x','Position x',-12,12,0.1],['y','Position y',-12,12,0.1],['v','Vitesse',0,4,0.01],['a','Angle °',-180,180,1]];
 var initial={m1:8,x1:-3,y1:0,v1:0.25,a1:-90,m2:2,x2:3,y2:0,v2:1,a2:90};
 var starts=[],bodies=[],tracks=[[],[]],running=false,t=0,drag=-1,selected=0,stop=false,previous=0,acc=0,dt=0.003;
 function makeControls(){for(var i=1;i<=2;i++){for(var j=0;j<defs.length;j++){var d=defs[j],key=d[0]+i,wrap=document.createElement('div');wrap.className='control';var lab=document.createElement('label');lab.htmlFor=key;lab.textContent=d[1];var inp=document.createElement('input');inp.type='range';inp.id=key;inp.min=d[2];inp.max=d[3];inp.step=d[4];inp.value=initial[key];var out=document.createElement('output');out.id=key+'out';out.textContent=inp.value;wrap.appendChild(lab);wrap.appendChild(inp);wrap.appendChild(out);$('c'+i).appendChild(wrap);inp.addEventListener('input',function(e){var id=e.target.id;$(id+'out').textContent=e.target.value;if(!running&&t===0){var n=Number(id.slice(-1))-1;if(id[0]==='x'||id[0]==='y'){bodies[n][id[0]]=Number(e.target.value);starts[n][id[0]]=Number(e.target.value)}else if(id[0]==='m'){bodies[n].m=Number(e.target.value)}else if(id[0]==='v'||id[0]==='a'){var v=Number($('v'+(n+1)).value),a=Number($('a'+(n+1)).value)*Math.PI/180;starts[n].vx=v*Math.cos(a);starts[n].vy=v*Math.sin(a)}render()}})}}}
